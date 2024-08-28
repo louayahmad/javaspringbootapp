@@ -22,7 +22,7 @@ public class Movie {
     private String title;
 
     @Column(name = "year")
-    private Integer year;
+    private String year;
 
     @Column(name = "rated")
     private String rated;
@@ -37,7 +37,7 @@ public class Movie {
     public Movie() {}
 
     // Parameterized constructor
-    public Movie(String title, Integer year, String rated, String released, String poster) {
+    public Movie(String title, String year, String rated, String released, String poster) {
         this.title = title;
         this.year = year;
         this.rated = rated;
@@ -62,11 +62,11 @@ public class Movie {
         this.title = title;
     }
 
-    public Integer getYear() {
+    public String getYear() {
         return year;
     }
 
-    public void setYear(Integer year) {
+    public void setYear(String year) {
         this.year = year;
     }
 
