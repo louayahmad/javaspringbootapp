@@ -1,4 +1,4 @@
-package com.example.demo.configs;
+package com.app.reminder.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

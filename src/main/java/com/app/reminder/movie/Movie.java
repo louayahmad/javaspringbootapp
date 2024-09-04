@@ -1,4 +1,4 @@
-package com.example.demo.movie;
+package com.app.reminder.movie;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package com.example.demo.user;
+package com.app.reminder.user;
 
 import java.util.List;
 

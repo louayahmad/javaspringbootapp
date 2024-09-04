@@ -1,4 +1,4 @@
-package com.example.demo.services;
+package com.app.reminder.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;

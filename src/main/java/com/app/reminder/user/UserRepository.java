@@ -1,10 +1,10 @@
-package com.example.demo.movie;
-
-import java.util.UUID;
+package com.app.reminder.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MovieRepository extends JpaRepository<Movie, UUID> {
+public interface UserRepository extends JpaRepository<User, String> {
+
+    
 }
