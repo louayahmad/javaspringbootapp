@@ -51,8 +51,8 @@ public class MovieController {
                 JsonNode movieNode = elements.next();
             
                 String title = movieNode.path("title").asText();
-                String year = movieNode.path("release_date").asText().split("-")[0]; // Extract year from release_date as String
-                String rated = movieNode.path("original_language").asText(); // Assuming `original_language` as a placeholder for `rated`
+                String year = movieNode.path("release_date").asText().split("-")[0]; 
+                String rated = movieNode.path("original_language").asText();
                 String released = movieNode.path("release_date").asText();
                 String poster = "https://image.tmdb.org/t/p/w500" + movieNode.path("poster_path").asText();
             

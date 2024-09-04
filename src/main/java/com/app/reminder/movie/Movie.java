@@ -33,10 +33,8 @@ public class Movie {
     @Column(name = "poster")
     private String poster;
 
-    // Default constructor
     public Movie() {}
 
-    // Parameterized constructor
     public Movie(String title, String year, String rated, String released, String poster) {
         this.title = title;
         this.year = year;
@@ -45,7 +43,6 @@ public class Movie {
         this.poster = poster;
     }
 
-    // Getters and Setters
     public UUID getId() {
         return id;
     }
