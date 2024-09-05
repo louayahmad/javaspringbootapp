@@ -1,14 +1,11 @@
 package com.app.reminder.episodes;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import com.app.reminder.tvshows.TVShow;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -18,9 +15,8 @@ import jakarta.persistence.Table;
 @Table(name = "episodes")
 public class Episode{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false, updatable = false)
-    private UUID id;
+    private String id;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -35,17 +31,18 @@ public class Episode{
     public Episode() {
     }
 
-    public Episode(String name, LocalDateTime datetime, TVShow tvShow) {
+    public Episode(String id, String name, LocalDateTime datetime, TVShow tvShow) {
+        this.id = id;
         this.name = name;
         this.datetime = datetime;
         this.tvShow = tvShow;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
