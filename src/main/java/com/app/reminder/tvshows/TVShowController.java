@@ -3,6 +3,7 @@ package com.app.reminder.tvshows;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,10 @@ import com.app.reminder.episodes.Episode;
 import com.app.reminder.episodes.EpisodeRepository;
 import com.app.reminder.genres.Genre;
 import com.app.reminder.genres.GenreRepository;
+import com.app.reminder.tvshows.payloads.response.TVShowsResponseDTO;
+import com.app.reminder.tvshows.payloads.response.helpers.EpisodesDTO;
+import com.app.reminder.tvshows.payloads.response.helpers.GenresDTO;
+
 
 
 
@@ -42,6 +47,43 @@ public class TVShowController {
         tvShowRepository.save(tvshow);
         return new ResponseEntity<>("TVShow " + tvshow.getName() + " added successfully!", HttpStatus.CREATED);
     }
+
+    @GetMapping("/get/all")
+    public ResponseEntity<List<TVShowsResponseDTO>> getAllTvShows(){
+        List<TVShow> shows = tvShowRepository.findAll();
+        List<TVShowsResponseDTO> response = new ArrayList<>();
+        
+        for (TVShow show: shows){
+            TVShowsResponseDTO tvShowDTO = new TVShowsResponseDTO();
+            tvShowDTO.setId(show.getId());
+            tvShowDTO.setShowName(show.getName());
+            tvShowDTO.setLanguage(show.getLanguage());
+            tvShowDTO.setPremiered(show.getPremiered());
+            tvShowDTO.setNetwork(show.getNetwork());
+            
+            tvShowDTO.setGenres(show.getGenres().stream()
+                .map(genre -> {
+                    GenresDTO genreDTO = new GenresDTO();
+                    genreDTO.setGenre(genre.getGenre());
+                    return genreDTO;
+                })
+                .collect(Collectors.toList()));
+
+            tvShowDTO.setEpisodes(show.getEpisodes().stream()
+                .map(episode -> {
+                    EpisodesDTO episodesDTO = new EpisodesDTO();
+                    episodesDTO.setEpisodeName(episode.getName());
+                    episodesDTO.setEpisodeDateTime(episode.getDatetime());
+                    return episodesDTO;
+                })
+                .collect(Collectors.toList()));
+            
+            response.add(tvShowDTO);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    
 
     @GetMapping("/all")
     public ResponseEntity<List<TVShow>> allTvShows() {
