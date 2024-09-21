@@ -28,8 +28,8 @@ public class TVShow {
     @Column(name = "premiered")
     private String premiered;
 
-    @Column(name = "ended")
-    private String ended;
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "network")
     private String network;
@@ -43,13 +43,13 @@ public class TVShow {
     public TVShow(){}
 
     public TVShow(String id, String name, String language, List<Genre> genres, String premiered, 
-                  String ended, String network, List<Episode> episodes) {
+                  String status, String network, List<Episode> episodes) {
         this.id = id;
         this.name = name;
         this.language = language;
         this.genres = genres;
         this.premiered = premiered;
-        this.ended = ended;
+        this.status = status;
         this.network = network;
         this.episodes = episodes;
     }
@@ -94,12 +94,12 @@ public class TVShow {
         this.premiered = premiered;
     }
 
-    public String getEnded() {
-        return ended;
+    public String getStatus() {
+        return status;
     }
 
-    public void setEnded(String ended) {
-        this.ended = ended;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getNetwork() {

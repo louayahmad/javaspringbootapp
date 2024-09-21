@@ -1,144 +1,114 @@
 package com.app.reminder.endpoints.tvshows;
 
-import java.time.LocalDateTime;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
-import com.app.reminder.endpoints.episodes.Episode;
-import com.app.reminder.endpoints.episodes.EpisodeRepository;
-import com.app.reminder.endpoints.genres.Genre;
-import com.app.reminder.endpoints.genres.GenreRepository;
-import com.app.reminder.endpoints.tvshows.payloads.response.TVShowsResponseDTO;
-import com.app.reminder.endpoints.tvshows.payloads.response.helpers.EpisodesDTO;
-import com.app.reminder.endpoints.tvshows.payloads.response.helpers.GenresDTO;
+import com.app.reminder.endpoints.tvshows.payloads.apis.TVMazeAPIShows;
+import com.app.reminder.endpoints.tvshows.payloads.response.TVShowsResponse;
+import com.app.reminder.utils.services.HttpRequest;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-
-
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/tv-show")
+@RequestMapping("/tvshow")
+@Tag(name = "TV Show", description = "Get currently airing TV shows.")
 public class TVShowController {
 
+    private static final Logger logger = LoggerFactory.getLogger(TVShowController.class);
+
     @Autowired
-    private TVShowRepository tvShowRepository;
+    private HttpRequest httpRequest;
+
     @Autowired
-    private EpisodeRepository episodeRepository;
-    @Autowired
-    private GenreRepository genreRepository;
+    private TVShowRepository tvShowRepository; 
+
+    private static final String TVMAZE_API_BASE_URL = "https://api.tvmaze.com";
+    private static final String API_KEY = "";
+
+    @GetMapping("/shows")
+    public ResponseEntity<List<TVShowsResponse>> getAllTvShows() {
+        logger.info("Fetching all currently airing TV shows from TV Maze API");
     
-    @PostMapping("/add")
-    public ResponseEntity<String> addMovie(@RequestBody TVShow tvshow) {
-        tvShowRepository.save(tvshow);
-        return new ResponseEntity<>("TVShow " + tvshow.getName() + " added successfully!", HttpStatus.CREATED);
-    }
-
-    @GetMapping("/get/all")
-    public ResponseEntity<List<TVShowsResponseDTO>> getAllTvShows(){
-        List<TVShow> shows = tvShowRepository.findAll();
-        List<TVShowsResponseDTO> response = new ArrayList<>();
-        
-        for (TVShow show: shows){
-            TVShowsResponseDTO tvShowDTO = new TVShowsResponseDTO();
-            tvShowDTO.setId(show.getId());
-            tvShowDTO.setShowName(show.getName());
-            tvShowDTO.setLanguage(show.getLanguage());
-            tvShowDTO.setPremiered(show.getPremiered());
-            tvShowDTO.setNetwork(show.getNetwork());
-            
-            tvShowDTO.setGenres(show.getGenres().stream()
-                .map(genre -> {
-                    GenresDTO genreDTO = new GenresDTO();
-                    genreDTO.setGenre(genre.getGenre());
-                    return genreDTO;
-                })
-                .collect(Collectors.toList()));
-
-            tvShowDTO.setEpisodes(show.getEpisodes().stream()
-                .map(episode -> {
-                    EpisodesDTO episodesDTO = new EpisodesDTO();
-                    episodesDTO.setEpisodeName(episode.getName());
-                    episodesDTO.setEpisodeDateTime(episode.getDatetime());
-                    return episodesDTO;
-                })
-                .collect(Collectors.toList()));
-            
-            response.add(tvShowDTO);
+        String tvMazeAPIUrl = TVMAZE_API_BASE_URL + "/show";
+        ResponseEntity<String> response = httpRequest.get(tvMazeAPIUrl, null, API_KEY);
+    
+        if (response.getStatusCode() != HttpStatus.OK) {
+            logger.error("TV Maze API call failed with status code: {}", response.getStatusCode());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "TV Maze API failed.");
         }
+    
+        String tvMazeAPIShows = response.getBody();
+        if (tvMazeAPIShows == null) {
+            logger.error("Received empty response from TV Maze API.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Empty response from TV Maze API.");
+        }
+    
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<TVShowsResponse> allShows = new ArrayList<>();
+        List<TVShow> newShows = new ArrayList<>();
+    
+        try {
+            List<TVMazeAPIShows> showsArray = objectMapper.readValue(tvMazeAPIShows, new TypeReference<List<TVMazeAPIShows>>() {});
+            
+            Set<String> existingShowIds = new HashSet<>();
+            for (TVShow existingShow : tvShowRepository.findAll()) {
+                existingShowIds.add(existingShow.getId());
+            }
+    
+            for (TVMazeAPIShows apiShow : showsArray) {
+                if (apiShow.getStatus() != null && "Running".equals(apiShow.getStatus()) &&
+                    apiShow.getNetwork() != null && apiShow.getNetwork().getCountry() != null &&
+                    "US".equals(apiShow.getNetwork().getCountry().getCode())) {
+                    
+                    String showId = apiShow.getName().toLowerCase().replace(" ", "_");
+                    String showName = apiShow.getName();
+                    String showLanguage = apiShow.getLanguage();
+                    String showPremiered = apiShow.getPremiered();
+                    String showStatus = apiShow.getStatus();
+                    String showNetwork = apiShow.getNetwork().getName();
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+                    TVShow tvShow = new TVShow(showId, showName, showLanguage, null, 
+                    showPremiered, showStatus, showNetwork, null);
+
+                    TVShowsResponse tvShowsResponse = new TVShowsResponse(showId, showName, showLanguage, 
+                    showPremiered, showStatus, showNetwork);
+    
+                    allShows.add(tvShowsResponse);
+                
+                    if (!existingShowIds.contains(tvShow.getId())) {
+                        newShows.add(tvShow);
+                        logger.info("Prepared new TV show for saving: {}", tvShow.getName());
+                    } else {
+                        logger.info("TV show already exists: {}", tvShow.getName());
+                    }
+                }
+            }
+            
+            if (!newShows.isEmpty()) {
+                tvShowRepository.saveAll(newShows);
+                logger.info("Saved {} new TV shows.", newShows.size());
+            }
+    
+            logger.info("Successfully fetched and processed {} currently airing shows.", allShows.size());
+            return new ResponseEntity<>(allShows, HttpStatus.OK);
+        } catch (IOException e) {
+            logger.error("Error parsing response from TV Maze API: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing TV shows data.");
+        }
     }
-    
-
-    @GetMapping("/all")
-    public ResponseEntity<List<TVShow>> allTvShows() {
-        TVShow show1 = new TVShow();
-        show1.setId("prison_break");
-        show1.setName("Prison Break");
-        show1.setNetwork("FOX");
-        show1.setLanguage("English");
-        show1.setPremiered("2005-08-29");
-        show1.setEnded("2009-05-15");
-
-        TVShow show2 = new TVShow();
-        show2.setId("breaking_bad");
-        show2.setName("Breaking Bad");
-        show2.setNetwork("AMC");
-        show2.setLanguage("English");
-        show2.setPremiered("2008-01-20");
-        show2.setEnded("2013-09-29");
-
-        List<TVShow> shows = new ArrayList<>();
-        shows.add(show1);
-        shows.add(show2);
-
-        tvShowRepository.saveAll(shows);
-
-        Genre genre1 = new Genre("Drama", show1);
-        Genre genre2 = new Genre("Thriller", show1);
-
-        Genre genre3 = new Genre("Crime", show2);
-        Genre genre4 = new Genre("Drama", show2);
-        Genre genre5 = new Genre("Thriller", show2);
-
-        List<Genre> genres = new ArrayList<>();
-        genres.add(genre1);
-        genres.add(genre2);
-        genres.add(genre3);
-        genres.add(genre4);
-        genres.add(genre5);
-
-        genreRepository.saveAll(genres);
-
-        Episode episode1 = new Episode("prison_break_pilot","Pilot", LocalDateTime.of(2024, 9, 20, 9, 20), show1);
-        Episode episode2 = new Episode("prison_break_allen","Allen", LocalDateTime.of(2005, 9, 5, 20, 0), show1);
-    
-        Episode episode3 = new Episode("breaking_bad_pilot", "Pilot", LocalDateTime.of(2008, 1, 20, 21, 0), show2);
-    
-        episodeRepository.saveAll(List.of(episode1, episode2, episode3));
-
-        // reminderSchedulerService.scheduleEpisodeReminder("louayahmad20@gmail.com", episode1);
-        // reminderSchedulerService.scheduleEpisodeReminder("nathira_ahmad@yahoo.com", episode1);
-
-        List<TVShow> data = tvShowRepository.findAll();
-        return new ResponseEntity<>(data, HttpStatus.OK);
-    }
-    
-    @RequestMapping(value = "/add/episode", method = RequestMethod.POST)
-    public ResponseEntity<String> add_show_episode(@RequestBody Episode episode) {
-        String data = "Received!";
-       
-        return new ResponseEntity<>(data, HttpStatus.OK);
-    }
-        
 }
