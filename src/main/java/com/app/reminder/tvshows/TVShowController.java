@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.reminder.episodes.Episode;
 import com.app.reminder.episodes.EpisodeRepository;
 import com.app.reminder.genres.Genre;
 import com.app.reminder.genres.GenreRepository;
+import com.app.reminder.services.ReminderSchedulerService;
 import com.app.reminder.tvshows.payloads.response.TVShowsResponseDTO;
 import com.app.reminder.tvshows.payloads.response.helpers.EpisodesDTO;
 import com.app.reminder.tvshows.payloads.response.helpers.GenresDTO;
@@ -35,12 +37,8 @@ public class TVShowController {
     private EpisodeRepository episodeRepository;
     @Autowired
     private GenreRepository genreRepository;
-
-    public TVShowController(TVShowRepository tvShowRepository, EpisodeRepository episodeRepository, GenreRepository genreRepository){
-        this.tvShowRepository = tvShowRepository;
-        this.episodeRepository = episodeRepository;
-        this.genreRepository = genreRepository;
-    }
+    @Autowired
+    private ReminderSchedulerService reminderSchedulerService;
 
     @PostMapping("/add")
     public ResponseEntity<String> addMovie(@RequestBody TVShow tvshow) {
@@ -125,15 +123,25 @@ public class TVShowController {
 
         genreRepository.saveAll(genres);
 
-        Episode episode1 = new Episode("prison_break_pilot","Pilot", LocalDateTime.of(2005, 8, 29, 20, 0), show1);
+        Episode episode1 = new Episode("prison_break_pilot","Pilot", LocalDateTime.of(2024, 9, 20, 9, 20), show1);
         Episode episode2 = new Episode("prison_break_allen","Allen", LocalDateTime.of(2005, 9, 5, 20, 0), show1);
     
         Episode episode3 = new Episode("breaking_bad_pilot", "Pilot", LocalDateTime.of(2008, 1, 20, 21, 0), show2);
     
         episodeRepository.saveAll(List.of(episode1, episode2, episode3));
 
+        // reminderSchedulerService.scheduleEpisodeReminder("louayahmad20@gmail.com", episode1);
+        // reminderSchedulerService.scheduleEpisodeReminder("nathira_ahmad@yahoo.com", episode1);
+
         List<TVShow> data = tvShowRepository.findAll();
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
     
+    @RequestMapping(value = "/add/episode", method = RequestMethod.POST)
+    public ResponseEntity<String> add_show_episode(@RequestBody Episode episode) {
+        String data = "Received!";
+       
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
+        
 }
