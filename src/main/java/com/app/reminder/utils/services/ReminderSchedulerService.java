@@ -1,8 +1,8 @@
 package com.app.reminder.utils.services;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.UUID;
 
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
@@ -27,17 +27,21 @@ public class ReminderSchedulerService {
     private Scheduler scheduler;
 
     public void scheduleReminderJob(Reminder reminder) throws SchedulerException {
-        LocalDateTime reminderTime = reminder.getReminderDateTime().minusMinutes(30);
+        ZonedDateTime reminderTime = reminder.getReminderDateTime().minusMinutes(30);
+
+        String randomId = UUID.randomUUID().toString();
+        String jobIdentity = reminder.getEpisode().getName() + "ReminderJob-" + randomId;
+        String triggerIdentity = reminder.getEpisode().getTvShow().getName() + "ReminderTrigger-" + randomId;
 
         JobDetail jobDetail = JobBuilder.newJob(ReminderJob.class)
-                .withIdentity(reminder.getEpisode().getName() + "ReminderJob", "episodeReminderGroup")
+                .withIdentity(jobIdentity, "episodeReminderGroup")
                 .usingJobData("email", reminder.getUserEmail())
                 .usingJobData("showName", reminder.getEpisode().getTvShow().getName())
                 .build();
 
         Trigger trigger = TriggerBuilder.newTrigger()
-                .withIdentity(reminder.getEpisode().getTvShow().getName() + "ReminderTrigger", "episodeReminderGroup")
-                .startAt(Date.from(reminderTime.atZone(ZoneId.systemDefault()).toInstant())) 
+                .withIdentity(triggerIdentity, "episodeReminderGroup")
+                .startAt(Date.from(reminderTime.toInstant()))
                 .build();
 
         logger.info("Scheduling reminder for show: {}, episode: {}, reminder time: {}",
@@ -50,7 +54,7 @@ public class ReminderSchedulerService {
         logger.info("Reminder scheduled successfully for show: {}, episode: {}",
                 reminder.getEpisode().getTvShow().getName(),
                 reminder.getEpisode().getName());
-    }
+        }
 
     public void scheduleEpisodeReminder(Reminder reminder) {
         try {

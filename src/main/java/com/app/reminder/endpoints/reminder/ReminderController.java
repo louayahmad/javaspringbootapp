@@ -1,6 +1,5 @@
 package com.app.reminder.endpoints.reminder;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -26,8 +25,8 @@ import com.app.reminder.utils.services.ReminderSchedulerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/reminder")
-@Tag(name = "Reminder", description = "Set TV show reminders.")
+@RequestMapping
+@Tag(name = "Reminders", description = "Set TV show reminders.")
 public class ReminderController {
     
     @Autowired
@@ -41,10 +40,10 @@ public class ReminderController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReminderController.class);
 
-    @PostMapping("/set")
+    @PostMapping("/reminders")
     public ResponseEntity<SetReminderResponse> setReminder(@RequestBody SetReminderRequest setReminderRequest) {        
         Optional<Episode> optionalEpisode = episodeRepository.findById(setReminderRequest.getEpisodeId());
-        LocalDateTime reminderDateTime = setReminderRequest.getReminderDateTime();
+        ZonedDateTime reminderDateTime = setReminderRequest.getReminderDateTime();
         String userEmail = setReminderRequest.getUserEmail();
 
         ZoneId estZoneId = ZoneId.of("America/New_York"); 
@@ -54,7 +53,7 @@ public class ReminderController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Episode not found");
         }
 
-        ZonedDateTime reminderZonedDateTime = reminderDateTime.atZone(estZoneId);
+        ZonedDateTime reminderZonedDateTime = reminderDateTime;
         ZonedDateTime nowZonedDateTime = ZonedDateTime.now(estZoneId);
 
         if (reminderZonedDateTime.isBefore(nowZonedDateTime)) {

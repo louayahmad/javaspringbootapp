@@ -1,11 +1,11 @@
 package com.app.reminder.endpoints.reminder.payloads.request;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import lombok.Data;
 
 @Data
 public class SetReminderRequest {
     String episodeId;
-    LocalDateTime reminderDateTime;
+    ZonedDateTime reminderDateTime;
     String userEmail;
 }

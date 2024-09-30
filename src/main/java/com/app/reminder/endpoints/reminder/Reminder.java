@@ -1,5 +1,5 @@
 package com.app.reminder.endpoints.reminder;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import com.app.reminder.endpoints.episodes.Episode;
@@ -27,14 +27,14 @@ public class Reminder {
     private Episode episode;
 
     @Column(name = "reminder_datetime", nullable = false)
-    private LocalDateTime reminderDateTime;
+    private ZonedDateTime reminderDateTime;
 
     @Column(name = "user_email", nullable = false)
     private String userEmail;
 
     public Reminder() {}
 
-    public Reminder(Episode episode, LocalDateTime reminderDateTime, String userEmail) {
+    public Reminder(Episode episode, ZonedDateTime reminderDateTime, String userEmail) {
         this.episode = episode;
         this.reminderDateTime = reminderDateTime;
         this.userEmail = userEmail;
@@ -56,11 +56,11 @@ public class Reminder {
         this.episode = episode;
     }
 
-    public LocalDateTime getReminderDateTime() {
+    public ZonedDateTime getReminderDateTime() {
         return reminderDateTime;
     }
 
-    public void setReminderDateTime(LocalDateTime reminderDateTime) {
+    public void setReminderDateTime(ZonedDateTime reminderDateTime) {
         this.reminderDateTime = reminderDateTime;
     }
 

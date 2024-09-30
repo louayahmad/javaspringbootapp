@@ -1,6 +1,6 @@
 package com.app.reminder.utils.exceptions;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.http.HttpStatus;
@@ -13,14 +13,14 @@ import org.springframework.web.server.ResponseStatusException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ExceptionResponse> handleResponseStatusException(ResponseStatusException ex, WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(
             ex.getStatusCode().value(),
             ex.getReason(),
-            LocalDateTime.now().format(formatter)
+            ZonedDateTime.now().format(formatter)
         );
         return new ResponseEntity<>(response, ex.getStatusCode());
     }
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         ExceptionResponse response = new ExceptionResponse(
             HttpStatus.INTERNAL_SERVER_ERROR.value(),
             "An unexpected error occurred. Please try again later.",
-            LocalDateTime.now().format(formatter)
+            ZonedDateTime.now().format(formatter)
         );
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }

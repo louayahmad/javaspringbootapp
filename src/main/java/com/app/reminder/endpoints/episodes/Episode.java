@@ -1,6 +1,6 @@
 package com.app.reminder.endpoints.episodes;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.app.reminder.endpoints.tvshows.TVShow;
 
@@ -22,7 +22,7 @@ public class Episode{
     private String name;
 
     @Column(name = "datetime", nullable = false)
-    private LocalDateTime datetime;
+    private ZonedDateTime datetime;
 
     @ManyToOne
     @JoinColumn(name = "tv_show_id")
@@ -31,7 +31,7 @@ public class Episode{
     public Episode() {
     }
 
-    public Episode(String id, String name, LocalDateTime datetime, TVShow tvShow) {
+    public Episode(String id, String name, ZonedDateTime datetime, TVShow tvShow) {
         this.id = id;
         this.name = name;
         this.datetime = datetime;
@@ -54,11 +54,11 @@ public class Episode{
         this.name = name;
     }
 
-    public LocalDateTime getDatetime() {
+    public ZonedDateTime getDatetime() {
         return datetime;
     }
 
-    public void setDateTime(LocalDateTime datetime) {
+    public void setDateTime(ZonedDateTime datetime) {
         this.datetime = datetime;
     }
 

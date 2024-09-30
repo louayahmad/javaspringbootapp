@@ -25,8 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/tvshow")
-@Tag(name = "TV Show", description = "Get currently airing TV shows.")
+@RequestMapping
+@Tag(name = "TV Shows", description = "Get currently airing TV shows.")
 public class TVShowController {
 
     private static final Logger logger = LoggerFactory.getLogger(TVShowController.class);
@@ -40,12 +40,12 @@ public class TVShowController {
     private static final String TVMAZE_API_BASE_URL = "https://api.tvmaze.com";
     private static final String API_KEY = "";
 
-    @GetMapping("/shows")
+    @GetMapping("/tvshows")
     public ResponseEntity<List<TVShowsResponse>> getAllTvShows() {
         logger.info("Fetching all currently airing TV shows from TV Maze API");
     
         String tvMazeAPIUrl = TVMAZE_API_BASE_URL + "/show";
-        ResponseEntity<String> response = httpRequest.get(tvMazeAPIUrl, null, API_KEY);
+        ResponseEntity<String> response = httpRequest.get(tvMazeAPIUrl, null, API_KEY, null);
     
         if (response.getStatusCode() != HttpStatus.OK) {
             logger.error("TV Maze API call failed with status code: {}", response.getStatusCode());
@@ -71,6 +71,10 @@ public class TVShowController {
             }
     
             for (TVMazeAPIShows apiShow : showsArray) {
+                if (allShows.size() == 20){
+                    break;
+                }
+
                 if (apiShow.getStatus() != null && "Running".equals(apiShow.getStatus()) &&
                     apiShow.getNetwork() != null && apiShow.getNetwork().getCountry() != null &&
                     "US".equals(apiShow.getNetwork().getCountry().getCode())) {
