@@ -86,7 +86,7 @@ public class TVShowController {
                     String showStatus = apiShow.getStatus();
                     String showNetwork = apiShow.getNetwork().getName();
 
-                    TVShow tvShow = new TVShow(showId, showName, showLanguage, null, 
+                    TVShow tvShow = new TVShow(showId, showName, showLanguage, 
                     showPremiered, showStatus, showNetwork, null);
 
                     TVShowsResponse tvShowsResponse = new TVShowsResponse(showId, showName, showLanguage, 
