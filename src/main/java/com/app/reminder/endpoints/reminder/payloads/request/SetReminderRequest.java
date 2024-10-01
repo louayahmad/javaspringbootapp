@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class SetReminderRequest {
-    String episodeId;
-    ZonedDateTime reminderDateTime;
-    String userEmail;
+    private String episodeId;
+    private ZonedDateTime reminderDateTime;
+    private String userEmail;
 }

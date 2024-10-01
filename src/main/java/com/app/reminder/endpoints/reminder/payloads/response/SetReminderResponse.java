@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SetReminderResponse {
-    String reminderId;
-    String episodeId;
-    ZonedDateTime reminderScheduled;
-    String message;
+    private String reminderId;
+    private String episodeId;
+    private ZonedDateTime reminderScheduled;
+    private String message;
 }

@@ -1,4 +1,4 @@
-package com.app.reminder.endpoints.episodes.payloads.api;
+package com.app.reminder.endpoints.tvshows.payloads.apis;
 
 import java.util.List;
 
