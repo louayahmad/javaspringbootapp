@@ -9,5 +9,4 @@ public class EpisodeResponse {
     private String episodeId;
     private String episodeName;
     private ZonedDateTime episodeAirDateTime;
-    
 }

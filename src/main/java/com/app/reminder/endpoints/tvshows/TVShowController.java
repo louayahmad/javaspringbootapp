@@ -29,89 +29,105 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "TV Shows", description = "Get currently airing TV shows.")
 public class TVShowController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TVShowController.class);
-
-    @Autowired
-    private HttpRequest httpRequest;
-
-    @Autowired
-    private TVShowRepository tvShowRepository; 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TVShowController.class);
 
     private static final String TVMAZE_API_BASE_URL = "https://api.tvmaze.com";
     private static final String API_KEY = "";
 
+    @Autowired
+    private HttpRequest httpRequest;
+    @Autowired
+    private TVShowRepository tvShowRepository;
+
+    /**
+     * Fetch all currently airing TV shows from TVMaze API.
+     * Returns a list of TV shows limited to 20, filtering by status and network
+     * country (US).
+     */
     @GetMapping("/tvshows")
     public ResponseEntity<List<TVShowsResponse>> getAllTvShows() {
-        logger.info("Fetching all currently airing TV shows from TV Maze API");
-    
+        LOGGER.info("Fetching all currently airing TV shows from TV Maze API");
+
         String tvMazeAPIUrl = TVMAZE_API_BASE_URL + "/show";
         ResponseEntity<String> response = httpRequest.get(tvMazeAPIUrl, null, API_KEY, null);
-    
+
         if (response.getStatusCode() != HttpStatus.OK) {
-            logger.error("TV Maze API call failed with status code: {}", response.getStatusCode());
+            LOGGER.error("TV Maze API call failed with status code: {}", response.getStatusCode());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "TV Maze API failed.");
         }
-    
+
         String tvMazeAPIShows = response.getBody();
         if (tvMazeAPIShows == null) {
-            logger.error("Received empty response from TV Maze API.");
+            LOGGER.error("Received empty response from TV Maze API.");
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Empty response from TV Maze API.");
         }
-    
+
         ObjectMapper objectMapper = new ObjectMapper();
         List<TVShowsResponse> allShows = new ArrayList<>();
         List<TVShow> newShows = new ArrayList<>();
-    
+
         try {
-            List<TVMazeAPIShows> showsArray = objectMapper.readValue(tvMazeAPIShows, new TypeReference<List<TVMazeAPIShows>>() {});
-            
+            List<TVMazeAPIShows> showsArray = objectMapper.readValue(tvMazeAPIShows,
+                    new TypeReference<List<TVMazeAPIShows>>() {
+                    });
+
             Set<String> existingShowIds = new HashSet<>();
             for (TVShow existingShow : tvShowRepository.findAll()) {
                 existingShowIds.add(existingShow.getId());
             }
-    
+
             for (TVMazeAPIShows apiShow : showsArray) {
-                if (allShows.size() == 20){
+                // Limit the number of shows processed to 20 for performance reasons (pagination
+                // to be added).
+                if (allShows.size() == 20) {
                     break;
                 }
 
-                if (apiShow.getStatus() != null && "Running".equals(apiShow.getStatus()) &&
-                    apiShow.getNetwork() != null && apiShow.getNetwork().getCountry() != null &&
-                    "US".equals(apiShow.getNetwork().getCountry().getCode())) {
-                    
-                    String showId = apiShow.getName().toLowerCase().replace(" ", "_");
-                    String showName = apiShow.getName();
-                    String showLanguage = apiShow.getLanguage();
-                    String showPremiered = apiShow.getPremiered();
-                    String showStatus = apiShow.getStatus();
-                    String showNetwork = apiShow.getNetwork().getName();
+                // Filter shows that are "Running" and aired in the US.
+                if (apiShow.getStatus().equals("Running") &&
+                        apiShow.getNetwork() != null &&
+                        apiShow.getNetwork().getCountry() != null &&
+                        apiShow.getNetwork().getCountry().getCode().equals("US")) {
 
-                    TVShow tvShow = new TVShow(showId, showName, showLanguage, 
-                    showPremiered, showStatus, showNetwork, null);
+                    String showId, showName, showLanguage, showPremiered, showStatus, showNetwork;
+                    Integer tvMazeShowId;
 
-                    TVShowsResponse tvShowsResponse = new TVShowsResponse(showId, showName, showLanguage, 
-                    showPremiered, showStatus, showNetwork);
-    
+                    // Construct a unique show ID and extract show details.
+                    showId = apiShow.getName().toLowerCase().replace(" ", "_");
+                    tvMazeShowId = apiShow.getId();
+                    showName = apiShow.getName();
+                    showLanguage = apiShow.getLanguage();
+                    showPremiered = apiShow.getPremiered();
+                    showStatus = apiShow.getStatus();
+                    showNetwork = apiShow.getNetwork().getName();
+
+                    TVShow tvShow = new TVShow(showId, tvMazeShowId, showName, showLanguage,
+                            showPremiered, showStatus, showNetwork, null);
+
+                    TVShowsResponse tvShowsResponse = new TVShowsResponse(showId, tvMazeShowId, showName, showLanguage,
+                            showPremiered, showStatus, showNetwork);
+
                     allShows.add(tvShowsResponse);
-                
+
+                    // Check if the show is not already in the database and prepare it for saving.
                     if (!existingShowIds.contains(tvShow.getId())) {
                         newShows.add(tvShow);
-                        logger.info("Prepared new TV show for saving: {}", tvShow.getName());
+                        LOGGER.info("Prepared new TV show for saving: {}", tvShow.getName());
                     } else {
-                        logger.info("TV show already exists: {}", tvShow.getName());
+                        LOGGER.info("TV show already exists: {}", tvShow.getName());
                     }
                 }
             }
-            
+
             if (!newShows.isEmpty()) {
                 tvShowRepository.saveAll(newShows);
-                logger.info("Saved {} new TV shows.", newShows.size());
+                LOGGER.info("Saved {} new TV shows.", newShows.size());
             }
-    
-            logger.info("Successfully fetched and processed {} currently airing shows.", allShows.size());
+
+            LOGGER.info("Successfully fetched and processed {} currently airing shows.", allShows.size());
             return new ResponseEntity<>(allShows, HttpStatus.OK);
         } catch (IOException e) {
-            logger.error("Error parsing response from TV Maze API: {}", e.getMessage());
+            LOGGER.error("Error parsing response from TV Maze API: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing TV shows data.");
         }
     }

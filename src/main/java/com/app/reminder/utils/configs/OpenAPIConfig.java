@@ -12,9 +12,9 @@ public class OpenAPIConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-            .info(new Info()
-                .title("TV Show Reminder API")
-                .version("1.0")
-                .description("Schedule Upcoming TV Show Episodes"));
+                .info(new Info()
+                        .title("TV Show Reminder API")
+                        .version("1.0")
+                        .description("Schedule Upcoming TV Show Episodes"));
     }
 }

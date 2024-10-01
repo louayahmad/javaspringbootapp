@@ -19,7 +19,7 @@ public class UserController {
     private UserRepository db;
 
     @GetMapping("/users")
-    public List<User> getAllUsers(){
+    public List<User> getAllUsers() {
         return db.findAll();
     }
 
@@ -29,9 +29,9 @@ public class UserController {
     }
 
     @PostMapping("users/add")
-    public String createUser(@RequestBody User user){
+    public String createUser(@RequestBody User user) {
         db.save(user);
         return "User " + user.getName() + " added successfully!";
     }
-    
+
 }

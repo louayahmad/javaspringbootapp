@@ -28,28 +28,28 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping
 @Tag(name = "Reminders", description = "Set TV show reminders.")
 public class ReminderController {
-    
+
     @Autowired
-    private ReminderRepository reminderRepository;  
+    private ReminderRepository reminderRepository;
 
     @Autowired
     private EpisodeRepository episodeRepository;
-    
+
     @Autowired
     private ReminderSchedulerService reminderSchedulerService;
 
-    private static final Logger logger = LoggerFactory.getLogger(ReminderController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReminderController.class);
 
     @PostMapping("/reminders")
-    public ResponseEntity<SetReminderResponse> setReminder(@RequestBody SetReminderRequest setReminderRequest) {        
+    public ResponseEntity<SetReminderResponse> setReminder(@RequestBody SetReminderRequest setReminderRequest) {
         Optional<Episode> optionalEpisode = episodeRepository.findById(setReminderRequest.getEpisodeId());
         ZonedDateTime reminderDateTime = setReminderRequest.getReminderDateTime();
         String userEmail = setReminderRequest.getUserEmail();
 
-        ZoneId estZoneId = ZoneId.of("America/New_York"); 
+        ZoneId estZoneId = ZoneId.of("America/New_York");
 
         if (optionalEpisode.isEmpty()) {
-            logger.info("No episode found with episode id {}.", setReminderRequest.getEpisodeId());
+            LOGGER.info("No episode found with episode id {}.", setReminderRequest.getEpisodeId());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Episode not found");
         }
 
@@ -57,7 +57,7 @@ public class ReminderController {
         ZonedDateTime nowZonedDateTime = ZonedDateTime.now(estZoneId);
 
         if (reminderZonedDateTime.isBefore(nowZonedDateTime)) {
-            logger.warn("Reminder datetime {} cannot be in the past.", reminderZonedDateTime);
+            LOGGER.warn("Reminder datetime {} cannot be in the past.", reminderZonedDateTime);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reminder datetime cannot be in the past");
         }
 
@@ -69,19 +69,18 @@ public class ReminderController {
         try {
             reminderSchedulerService.scheduleReminderJob(reminder);
         } catch (SchedulerException error) {
-            logger.info("An error has occured while scheduling the reminder!", error);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An error has occured while scheduling the reminder!");
+            LOGGER.info("An error has occured while scheduling the reminder!", error);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "An error has occured while scheduling the reminder!");
 
         }
 
         return new ResponseEntity<>(
-            new SetReminderResponse(
-                reminder.getId().toString(), 
-                reminder.getEpisode().getId().toString(), 
-                reminder.getReminderDateTime(), 
-                String.format("Successfully set reminder for episode: %s", reminder.getEpisode().getName())
-            ), 
-            HttpStatus.OK
-        );    
+                new SetReminderResponse(
+                        reminder.getId().toString(),
+                        reminder.getEpisode().getId().toString(),
+                        reminder.getReminderDateTime(),
+                        String.format("Successfully set reminder for episode: %s", reminder.getEpisode().getName())),
+                HttpStatus.OK);
     }
 }

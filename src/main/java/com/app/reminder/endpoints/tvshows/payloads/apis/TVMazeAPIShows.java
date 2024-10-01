@@ -25,8 +25,8 @@ public class TVMazeAPIShows {
     private Rating rating;
     private int weight;
     private Network network;
-    private Object webChannel;  
-    private Object dvdCountry;   
+    private Object webChannel;
+    private Object dvdCountry;
     private Image image;
     private String summary;
     private long updated;

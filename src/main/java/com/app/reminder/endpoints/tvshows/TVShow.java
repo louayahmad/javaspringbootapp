@@ -16,8 +16,11 @@ public class TVShow {
 
     @Id
     @Column(name = "id", updatable = false, nullable = false)
-    private String id; 
-    
+    private String id;
+
+    @Column(name = "tvMazeShowId", updatable = false, nullable = false)
+    private Integer tvMazeShowId;
+
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -27,7 +30,7 @@ public class TVShow {
     @Column(name = "premiered")
     private String premiered;
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private String status;
 
     @Column(name = "network")
@@ -36,11 +39,13 @@ public class TVShow {
     @OneToMany(mappedBy = "tvShow")
     private List<Episode> episodes;
 
-    public TVShow(){}
+    public TVShow() {
+    }
 
-    public TVShow(String id, String name, String language, String premiered, 
-                  String status, String network, List<Episode> episodes) {
+    public TVShow(String id, Integer tvMazeShowId, String name, String language, String premiered,
+            String status, String network, List<Episode> episodes) {
         this.id = id;
+        this.tvMazeShowId = tvMazeShowId;
         this.name = name;
         this.language = language;
         this.premiered = premiered;
@@ -55,6 +60,14 @@ public class TVShow {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Integer getTVMazeShowId() {
+        return tvMazeShowId;
+    }
+
+    public void setTVMazeShowId(Integer tvMazeShowId) {
+        this.tvMazeShowId = tvMazeShowId;
     }
 
     public String getName() {

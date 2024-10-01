@@ -4,15 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data                    
-@AllArgsConstructor    
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
 public class TVShowsResponse {
-    private String id; 
+    private String id;
+    private Integer tvMazeShowId;
     private String showName;
     private String language;
     private String premiered;
     private String status;
     private String network;
 }
-

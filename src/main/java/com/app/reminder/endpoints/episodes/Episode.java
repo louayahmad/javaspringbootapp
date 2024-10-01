@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "episodes")
-public class Episode{
+public class Episode {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     private String id;

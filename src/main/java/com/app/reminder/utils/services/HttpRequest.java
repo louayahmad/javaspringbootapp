@@ -18,7 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 public class HttpRequest {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequest.class);
 
     @Autowired
     private RestTemplate restTemplate;
@@ -42,7 +42,7 @@ public class HttpRequest {
         }
 
         URI uri = uriBuilder.build().encode().toUri();
-        logger.info("Request URL {}", uri);
+        LOGGER.info("Request URL {}", uri);
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
         try {

@@ -16,7 +16,7 @@ public class ReminderJob implements Job {
     @Autowired
     private SendEmail sendEmail;
 
-    private static final Logger logger = LoggerFactory.getLogger(ReminderJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReminderJob.class);
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -25,13 +25,14 @@ public class ReminderJob implements Job {
             String showName = (String) context.getJobDetail().getJobDataMap().get("showName");
 
             if (email != null && showName != null) {
-                sendEmail.sendReminderEmail(email, "TV Show Reminder", "Your show " + showName + " is starting in 30 minutes!");
-                logger.info("Reminder email sent to {} for show: {}", email, showName);
+                sendEmail.sendReminderEmail(email, "TV Show Reminder",
+                        "Your show " + showName + " is starting in 30 minutes!");
+                LOGGER.info("Reminder email sent to {} for show: {}", email, showName);
             } else {
-                logger.error("Email or showName was not provided to the ReminderJob.");
+                LOGGER.error("Email or showName was not provided to the ReminderJob.");
             }
         } catch (Exception e) {
-            logger.error("Failed to send reminder email.", e);
+            LOGGER.error("Failed to send reminder email.", e);
             throw new JobExecutionException(e);
         }
     }

@@ -1,4 +1,5 @@
 package com.app.reminder.endpoints.reminder;
+
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table (name = "reminder")
+@Table(name = "reminder")
 public class Reminder {
 
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,7 +33,8 @@ public class Reminder {
     @Column(name = "user_email", nullable = false)
     private String userEmail;
 
-    public Reminder() {}
+    public Reminder() {
+    }
 
     public Reminder(Episode episode, ZonedDateTime reminderDateTime, String userEmail) {
         this.episode = episode;
