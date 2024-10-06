@@ -38,7 +38,7 @@ public class TVShowController {
     private static final Logger LOGGER = LoggerFactory.getLogger(TVShowController.class);
 
     private static final String TVMAZE_API_BASE_URL = "https://api.tvmaze.com";
-    private static final String API_KEY = "";
+    private static final String API_KEY = "IMLJ9VEpeXIFSTepgM89N5kuD3x97PRv";
 
     @Autowired
     private HttpRequest httpRequest;

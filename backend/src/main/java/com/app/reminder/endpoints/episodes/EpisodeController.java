@@ -50,7 +50,7 @@ public class EpisodeController {
     private HttpRequest httpRequest;
 
     private static final String TVMAZE_API_BASE_URL = "https://api.tvmaze.com";
-    private static final String API_KEY = "";
+    private static final String API_KEY = "IMLJ9VEpeXIFSTepgM89N5kuD3x97PRv";
 
     @PostMapping("/episodes")
     public ResponseEntity<List<EpisodeResponse>> getTVShowEpisodes(@RequestBody EpisodeRequest episodeRequest) {
