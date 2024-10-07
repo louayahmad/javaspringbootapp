@@ -42,41 +42,56 @@ const GetTVShows = () => {
   }, []);
 
   return (
-    <div>
-      <h2>TV Shows</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">TV Shows</h2>
+      {error && <p className="text-red-600">{error}</p>}
       {loading ? (
-        <div className="spinner">
-          <div className="loading-circle"></div>
+        <div className="flex justify-center">
+          <div className="spinner">
+            <div className="loading-circle"></div>
+          </div>
         </div>
       ) : (
-        <ul>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {tvShows.map((tvShow, index) => (
-            <li key={`${tvShow.id}_${index}`}>
-              <strong>Show Name:</strong> {tvShow.showName}
-              <br />
-              <strong>Language:</strong> {tvShow.language}
-              <br />
-              <strong>Premiered:</strong> {tvShow.premiered}
-              <br />
-              <strong>Status:</strong> {tvShow.status}
-              <br />
-              <strong>Network:</strong> {tvShow.network}
-              <br />
-              <br />
-              <strong>Image:</strong>
-              <br />
-              {tvShow.image && (
-                <img
-                  src={tvShow.image}
-                  alt={tvShow.showName}
-                  style={{ width: "200px", height: "auto" }}
-                />
-              )}
-              <br />
-            </li>
+            <div
+              key={`${tvShow.id}_${index}`}
+              className="card bg-base-100 shadow-xl"
+            >
+              <figure>
+                {tvShow.image ? (
+                  <img
+                    src={tvShow.image}
+                    alt={tvShow.showName}
+                    className="rounded-t-lg"
+                  />
+                ) : (
+                  <div className="h-48 bg-gray-200 rounded-t-lg flex items-center justify-center">
+                    <span>No Image Available</span>
+                  </div>
+                )}
+              </figure>
+              <div className="card-body">
+                <h3 className="card-title">{tvShow.showName}</h3>
+                <p>
+                  <strong>Language:</strong> {tvShow.language}
+                </p>
+                <p>
+                  <strong>Premiered:</strong> {tvShow.premiered}
+                </p>
+                <p>
+                  <strong>Status:</strong> {tvShow.status}
+                </p>
+                <p>
+                  <strong>Network:</strong> {tvShow.network}
+                </p>
+                <div className="card-actions justify-end">
+                  <button className="btn btn-primary">View Details</button>
+                </div>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
