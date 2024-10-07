@@ -3,11 +3,13 @@ import React, { useEffect, useState } from "react";
 const GetTVShows = () => {
   const [tvShows, setTVShows] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getTvShows = async () => {
       console.log("Fetching TV shows...");
       setError(null);
+      setLoading(true);
 
       try {
         const response = await fetch("http://localhost:8080/tvshows", {
@@ -31,6 +33,8 @@ const GetTVShows = () => {
       } catch (error) {
         console.error("Error fetching TV shows:", error.message);
         setError(error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -41,11 +45,13 @@ const GetTVShows = () => {
     <div>
       <h2>TV Shows</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
-      <ul>
-        {tvShows.length === 0 ? (
-          <p>No TV shows available.</p>
-        ) : (
-          tvShows.map((tvShow, index) => (
+      {loading ? (
+        <div className="spinner">
+          <div className="loading-circle"></div>
+        </div>
+      ) : (
+        <ul>
+          {tvShows.map((tvShow, index) => (
             <li key={`${tvShow.id}_${index}`}>
               <strong>Show Name:</strong> {tvShow.showName}
               <br />
@@ -57,10 +63,21 @@ const GetTVShows = () => {
               <br />
               <strong>Network:</strong> {tvShow.network}
               <br />
+              <br />
+              <strong>Image:</strong>
+              <br />
+              {tvShow.image && (
+                <img
+                  src={tvShow.image}
+                  alt={tvShow.showName}
+                  style={{ width: "200px", height: "auto" }}
+                />
+              )}
+              <br />
             </li>
-          ))
-        )}
-      </ul>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

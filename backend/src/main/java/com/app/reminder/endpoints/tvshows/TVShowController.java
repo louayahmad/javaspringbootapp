@@ -95,7 +95,7 @@ public class TVShowController {
                         apiShow.getNetwork().getCountry() != null &&
                         "US".equals(apiShow.getNetwork().getCountry().getCode())) {
 
-                    String showId, showName, showLanguage, showPremiered, showStatus, showNetwork;
+                    String showId, showName, showLanguage, showPremiered, showStatus, showNetwork, showImage;
                     Integer tvMazeShowId;
 
                     // Construct a unique show ID and extract show details.
@@ -106,12 +106,13 @@ public class TVShowController {
                     showPremiered = apiShow.getPremiered();
                     showStatus = apiShow.getStatus();
                     showNetwork = apiShow.getNetwork().getName();
+                    showImage = apiShow.getImage().getOriginal();
 
                     TVShow tvShow = new TVShow(showId, tvMazeShowId, showName, showLanguage,
-                            showPremiered, showStatus, showNetwork, null);
+                            showPremiered, showStatus, showNetwork, showImage, null);
 
                     TVShowsResponse tvShowsResponse = new TVShowsResponse(showId, tvMazeShowId, showName, showLanguage,
-                            showPremiered, showStatus, showNetwork);
+                            showPremiered, showStatus, showNetwork, showImage);
 
                     allShows.add(tvShowsResponse);
 
@@ -182,7 +183,7 @@ public class TVShowController {
                         apiShow.getShow().getNetwork().getCountry() != null &&
                         "US".equals(apiShow.getShow().getNetwork().getCountry().getCode())) {
 
-                    String showId, showName, showLanguage, showPremiered, showStatus, showNetwork;
+                    String showId, showName, showLanguage, showPremiered, showStatus, showNetwork, showImage;
                     Integer tvMazeShowId;
 
                     // Construct a unique show ID and extract show details.
@@ -193,12 +194,13 @@ public class TVShowController {
                     showPremiered = apiShow.getShow().getPremiered();
                     showStatus = apiShow.getShow().getStatus();
                     showNetwork = apiShow.getShow().getNetwork().getName();
+                    showImage = apiShow.getShow().getImage().getOriginal();
 
                     TVShow tvShow = new TVShow(showId, tvMazeShowId, showName, showLanguage,
-                            showPremiered, showStatus, showNetwork, null);
+                            showPremiered, showStatus, showNetwork, showImage, null);
 
                     TVShowsResponse tvShowsResponse = new TVShowsResponse(showId, tvMazeShowId, showName, showLanguage,
-                            showPremiered, showStatus, showNetwork);
+                            showPremiered, showStatus, showNetwork, showImage);
 
                     allShows.add(tvShowsResponse);
 

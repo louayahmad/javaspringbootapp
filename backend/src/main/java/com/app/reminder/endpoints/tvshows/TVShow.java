@@ -36,6 +36,9 @@ public class TVShow {
     @Column(name = "network")
     private String network;
 
+    @Column(name = "image")
+    private String image;
+
     @OneToMany(mappedBy = "tvShow")
     private List<Episode> episodes;
 
@@ -43,7 +46,7 @@ public class TVShow {
     }
 
     public TVShow(String id, Integer tvMazeShowId, String name, String language, String premiered,
-            String status, String network, List<Episode> episodes) {
+            String status, String network, String image, List<Episode> episodes) {
         this.id = id;
         this.tvMazeShowId = tvMazeShowId;
         this.name = name;
@@ -51,6 +54,7 @@ public class TVShow {
         this.premiered = premiered;
         this.status = status;
         this.network = network;
+        this.image = image;
         this.episodes = episodes;
     }
 
@@ -108,6 +112,14 @@ public class TVShow {
 
     public void setNetwork(String network) {
         this.network = network;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public List<Episode> getEpisodes() {

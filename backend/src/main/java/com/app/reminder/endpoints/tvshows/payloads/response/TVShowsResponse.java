@@ -15,4 +15,5 @@ public class TVShowsResponse {
     private String premiered;
     private String status;
     private String network;
+    private String image;
 }
