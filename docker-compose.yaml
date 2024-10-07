@@ -9,7 +9,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend/tv-show-reminder-app:/react-app
+      - ./frontend/tv-show-reminder-app/src:/react-app/src
+      - ./frontend/tv-show-reminder-app/public:/react-app/public
       - /react-app/node_modules
     stdin_open: true
     tty: true
